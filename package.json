@@ -1,6 +1,6 @@
 {
   "name": "clawmem",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Lightweight memory management system for OpenClaw with 3-tier retrieval and automatic lifecycle monitoring",
   "main": "src/index.js",
   "type": "module",

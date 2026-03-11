@@ -6,14 +6,19 @@
 import Database from 'better-sqlite3';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import config from '../config/loader.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const db = new Database(join(__dirname, '..', 'clawmem.db'));
+const dbPath = join(__dirname, '..', config.database.path);
+const db = new Database(dbPath);
 
 // 启用 WAL 模式（更好的并发性能）
-db.pragma('journal_mode = WAL');
+if (config.database.walMode) {
+  db.pragma('journal_mode = WAL');
+  console.log('✅ 数据库 WAL 模式已启用');
+}
 
 // L0: 极简索引目录（每条记录 < 100 bytes）
 db.exec(`

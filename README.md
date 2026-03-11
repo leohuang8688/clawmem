@@ -70,7 +70,30 @@ cd /root/.openclaw/workspace/projects/clawmem
 npm install
 ```
 
-### 2. 初始化数据库
+### 2. 配置环境变量
+
+复制 `.env.example` 为 `.env`：
+
+```bash
+cp .env.example .env
+```
+
+根据需要修改配置项：
+
+```bash
+# 数据库配置
+DATABASE_PATH=./clawmem.db
+DATABASE_WAL_MODE=true
+
+# L0/L1/L2 配置
+L0_MAX_SUMMARY_LENGTH=100
+L1_MAX_SUMMARY_LENGTH=500
+
+# 生命周期监听
+WORKER_INTERVAL_MS=1000
+```
+
+### 3. 初始化数据库
 
 ```bash
 npm run db:init

@@ -5,12 +5,16 @@
 
 import db from '../database/init.js';
 import { v4 as uuidv4 } from 'uuid';
+import config from '../../config/loader.js';
 
 export class ClawMemCore {
   constructor(options = {}) {
     this.options = {
-      maxL0SummaryLength: 100,
-      maxL1SummaryLength: 500,
+      maxL0SummaryLength: config.retrieval.l0MaxSummaryLength,
+      maxL1SummaryLength: config.retrieval.l1MaxSummaryLength,
+      l2StoreHighValueOnly: config.retrieval.l2StoreHighValueOnly,
+      tokenEstimateRatio: config.retrieval.tokenEstimateRatio,
+      maxRetrieveLimit: config.retrieval.maxRetrieveLimit,
       ...options
     };
   }

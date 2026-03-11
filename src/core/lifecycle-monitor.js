@@ -5,19 +5,14 @@
 
 import db from '../database/init.js';
 import { clawMem } from './retrieval.js';
+import config from '../../config/loader.js';
 
 export class LifecycleMonitor {
   constructor() {
-    this.events = [
-      'session.start',      // 会话开始
-      'session.end',        // 会话结束
-      'tool.call',          // 工具调用
-      'memory.read',        // 记忆读取
-      'memory.write'        // 记忆写入
-    ];
-    
+    this.events = config.lifecycle.events;
     this.workerQueue = [];
     this.isProcessing = false;
+    this.workerIntervalMs = config.lifecycle.workerIntervalMs;
   }
 
   /**
@@ -76,8 +71,8 @@ export class LifecycleMonitor {
         console.error('❌ Worker 处理错误:', error.message);
       }
       
-      // 等待 1 秒
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // 等待配置的时间间隔
+      await new Promise(resolve => setTimeout(resolve, this.workerIntervalMs));
     }
   }
 
