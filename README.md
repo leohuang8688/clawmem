@@ -10,7 +10,7 @@
 
 ## 📖 简介
 
-**ClawMem** 是一个受 [Claude-Mem](https://docs.claude-mem.ai/architecture/overview) 启发的轻量级记忆管理系统，专为 OpenClaw 设计。
+**ClawMem** 是一个三层架构的轻量级记忆管理系统，专为 OpenClaw 设计。
 
 ### 核心特性
 
