@@ -1,129 +1,112 @@
-# 🧠 ClawMem - OpenClaw 轻量级记忆管理系统
+# 🧠 ClawMem - Lightweight Memory Management for OpenClaw
 
-> 三层检索 + 无感知监听 + Token 优化，让 OpenClaw 记忆管理更高效
+> 3-tier retrieval + Automatic lifecycle monitoring + Token optimization + Advanced search
 
 [![Version](https://img.shields.io/github/v/tag/leohuang8688/clawmem?label=version&color=green)](https://github.com/leohuang8688/clawmem)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![OpenClaw Extension](https://img.shields.io/badge/OpenClaw-Extension-blue)](https://github.com/openclaw/openclaw)
 
----
-
-## 📖 简介
-
-**ClawMem** 是一个三层架构的轻量级记忆管理系统，专为 OpenClaw 设计。
-
-### 核心特性
-
-- 🎯 **三层检索工作流** - L0 索引 → L1 时间线 → L2 详情
-- 👁️ **无感知生命周期监听** - 自动拦截 5 个关键事件
-- 💰 **Token 优化** - 节省 60-80% Token 消耗
-- 🗄️ **SQLite 混合存储** - 高性能 + 易部署
-- 🔧 **后台 Worker** - 静默处理，不阻塞主流程
-- 🔍 **高级搜索** - 关键词/时间/标签/会话搜索 (v0.0.3 新增)
+**[中文文档](README-CN.md)** | **[English Docs](README.md)**
 
 ---
 
-## 🏗️ 架构设计
+## 📖 Introduction
 
-### 三层检索工作流
+**ClawMem v0.0.5** is a lightweight memory management system designed for OpenClaw, inspired by [Claude-Mem](https://docs.claude-mem.ai/).
+
+### Core Features
+
+- 🎯 **3-Tier Retrieval** - L0 Index → L1 Timeline → L2 Details
+- 👁️ **Automatic Lifecycle Monitoring** - Intercepts 5 key events
+- 💰 **Token Optimization** - Save 60-80% on token costs
+- 🗄️ **SQLite Storage** - High performance + Easy deployment
+- 🔧 **Background Worker** - Silent processing, non-blocking
+- 🔍 **Advanced Search** - Keyword/Time/Tag/Session search
+
+---
+
+## 🏗️ Architecture
+
+### 3-Tier Retrieval Workflow
 
 ```
 ┌─────────────────────────────────────────┐
-│  L0: 极简索引 (< 100 chars/token)       │
-│  - 分类 + 时间戳 + 极简摘要              │
-│  - Token 消耗：< 25 tokens/条           │
-│  - 用途：快速筛选相关记录                │
+│  L0: Minimal Index (< 100 chars)        │
+│  - Category + Timestamp + Summary       │
+│  - Token Cost: < 25 tokens/record      │
+│  - Purpose: Fast filtering              │
 └─────────────────────────────────────────┘
-              ↓ (按需加载)
+              ↓ (On-demand)
 ┌─────────────────────────────────────────┐
-│  L1: 时间线索引 (< 500 chars/token)     │
-│  - 会话 ID + 事件类型 + 语义摘要         │
-│  - Token 消耗：< 125 tokens/条          │
-│  - 用途：理解上下文和时间线              │
+│  L1: Timeline (< 500 chars)             │
+│  - Session ID + Event + Semantic Summary│
+│  - Token Cost: < 125 tokens/record     │
+│  - Purpose: Context & timeline          │
 └─────────────────────────────────────────┘
-              ↓ (明确需要时加载)
+              ↓ (When needed)
 ┌─────────────────────────────────────────┐
-│  L2: 完整详情 (按需加载)                │
-│  - 完整内容 + 元数据 + 嵌入向量          │
-│  - Token 消耗：按需                       │
-│  - 用途：深度分析和详情查看              │
+│  L2: Full Details (On-demand)           │
+│  - Full Content + Metadata + Embeddings │
+│  - Token Cost: On-demand                │
+│  - Purpose: Deep analysis               │
 └─────────────────────────────────────────┘
 ```
 
-### 生命周期监听
+### Lifecycle Events
 
-拦截 OpenClaw 的 5 个关键事件：
+Automatically intercepts 5 key OpenClaw events:
 
-1. **session.start** - 会话开始
-2. **session.end** - 会话结束
-3. **tool.call** - 工具调用
-4. **memory.read** - 记忆读取
-5. **memory.write** - 记忆写入
+1. **session.start** - Session begins
+2. **session.end** - Session ends
+3. **tool.call** - Tool invocation
+4. **memory.read** - Memory read
+5. **memory.write** - Memory write
 
 ---
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 1. 安装依赖
+### 1. Install Dependencies
 
 ```bash
 cd /root/.openclaw/workspace/projects/clawmem
 npm install
 ```
 
-### 2. 配置环境变量
+### 2. Configure Environment
 
-复制 `.env.example` 为 `.env`：
+Copy `.env.example` to `.env`:
 
 ```bash
 cp .env.example .env
 ```
 
-根据需要修改配置项：
+Edit configuration as needed:
 
 ```bash
-# 数据库配置
+# Database
 DATABASE_PATH=./clawmem.db
 DATABASE_WAL_MODE=true
 
-# L0/L1/L2 配置
+# L0/L1/L2 Limits
 L0_MAX_SUMMARY_LENGTH=100
 L1_MAX_SUMMARY_LENGTH=500
 
-# 生命周期监听
+# Lifecycle Monitoring
 WORKER_INTERVAL_MS=1000
+
+# LLM Configuration
+LLM_PROVIDER=openai
+LLM_MODEL=gpt-3.5-turbo
 ```
 
-### 3. 初始化数据库
+### 3. Initialize Database
 
 ```bash
 npm run db:init
 ```
 
-### 3. 使用示例
-
-```javascript
-import clawMem from './projects/clawmem/src/index.js';
-
-// 存储记忆
-const recordId = clawMem.storeL0({
-  category: 'session',
-  summary: '用户查询 TSLA 股价',
-  timestamp: Math.floor(Date.now() / 1000)
-});
-
-// 检索记忆（三层工作流）
-const result = await clawMem.retrieve({
-  category: 'session',
-  includeTimeline: true,
-  includeDetails: true,
-  limit: 10
-});
-
-console.log(result);
-```
-
-### 4. 运行演示
+### 4. Run Demo
 
 ```bash
 node src/index.js
@@ -131,150 +114,188 @@ node src/index.js
 
 ---
 
-## 📊 Token 优化对比
+## 📚 Usage Examples
 
-### 传统方式（直接存储完整内容）
-
-```
-100 条记录 × 平均 500 tokens = 50,000 tokens
-```
-
-### ClawMem 三层检索
-
-```
-L0 索引：100 条 × 25 tokens  = 2,500 tokens
-L1 时间线：50 条 × 125 tokens = 6,250 tokens
-L2 详情：10 条 × 500 tokens = 5,000 tokens
-──────────────────────────────────────
-总计：13,750 tokens (节省 72.5%)
-```
-
----
-
-## 💡 使用场景
-
-### 场景 1: 会话历史管理
+### Basic Memory Storage
 
 ```javascript
-// 会话开始
-clawMem.storeL0({
+import clawMem from './clawmem/src/index.js';
+
+// Store L0 index
+const recordId = clawMem.storeL0({
   category: 'session',
-  summary: 'Leo 查询股票信息',
-  timestamp: Date.now()
+  summary: 'User queried TSLA stock price',
+  timestamp: Math.floor(Date.now() / 1000)
 });
 
-// 会话结束
-const history = await clawMem.retrieve({
-  category: 'session',
-  timeRange: {
-    start: Date.now() - 3600,
-    end: Date.now()
-  }
+// Store L1 timeline
+clawMem.storeL1({
+  record_id: recordId,
+  session_id: 'session_001',
+  event_type: 'query.stock',
+  semantic_summary: 'User asked about Tesla stock, system queried Yahoo Finance API',
+  tags: ['stock', 'TSLA', 'query']
+});
+
+// Store L2 details (on-demand)
+clawMem.storeL2({
+  record_id: recordId,
+  full_content: JSON.stringify({
+    query: 'TSLA price',
+    result: { price: 248.50, change: '+2.3%' }
+  }, null, 2)
 });
 ```
 
-### 场景 2: 工具调用追踪
+### Memory Retrieval
 
 ```javascript
-// 监听工具调用
+// 3-tier retrieval workflow
+const result = await clawMem.retrieve({
+  category: 'session',
+  includeTimeline: true,
+  includeDetails: false, // Load L2 only when needed
+  limit: 10
+});
+
+console.log(result);
+```
+
+### Advanced Search
+
+```javascript
+import { memorySearch } from './clawmem/src/index.js';
+
+// Keyword search
+const results = memorySearch.searchByKeyword('TSLA', {
+  category: 'session',
+  limit: 10
+});
+
+// Time range search
+const oneHourAgo = Math.floor(Date.now() / 1000) - 3600;
+const recent = memorySearch.searchByTimeRange({
+  start: oneHourAgo,
+  end: Math.floor(Date.now() / 1000)
+});
+
+// Session search
+const session = memorySearch.searchBySession('session_001', {
+  includeDetails: true
+});
+
+// Advanced search
+const advanced = await memorySearch.advancedSearch({
+  keyword: 'stock price',
+  timeRange: { start: oneHourAgo, end: Date.now() / 1000 },
+  includeDetails: true,
+  limit: 10
+});
+```
+
+### Lifecycle Monitoring
+
+```javascript
+import { lifecycleMonitor } from './clawmem/src/index.js';
+
+// Start monitoring
+lifecycleMonitor.start();
+
+// Intercept OpenClaw events
 lifecycleMonitor.intercept('tool.call', {
   tool_name: 'yahoo_finance',
   args: { symbol: 'AAPL' },
   session_id: 'session_001'
 });
-
-// 后续检索特定工具的调用历史
-const toolCalls = await clawMem.retrieve({
-  category: 'tool',
-  includeTimeline: true
-});
-```
-
-### 场景 3: 记忆优化存储
-
-```javascript
-// 自动存储（通过生命周期监听）
-// → L0 索引自动创建
-// → L1 时间线自动生成
-// → L2 详情按需存储
-
-// 手动检索
-const memory = await clawMem.retrieve({
-  category: 'memory',
-  includeDetails: true // 仅当需要时加载 L2
-});
 ```
 
 ---
 
-## 📁 项目结构
+## 📊 Token Optimization
+
+### Traditional Approach
+
+```
+100 records × 500 tokens = 50,000 tokens
+```
+
+### ClawMem 3-Tier Approach
+
+```
+L0 Index:    100 × 25 tokens   = 2,500 tokens
+L1 Timeline:  50 × 125 tokens  = 6,250 tokens
+L2 Details:   10 × 500 tokens  = 5,000 tokens
+───────────────────────────────────────────
+Total:       13,750 tokens (72.5% savings!)
+```
+
+---
+
+## 📁 Project Structure
 
 ```
 clawmem/
 ├── src/
 │   ├── core/
-│   │   ├── retrieval.js          # 三层检索核心
-│   │   └── lifecycle-monitor.js  # 生命周期监听
-│   ├── workers/
-│   │   └── lifecycle-worker.js   # 后台 Worker
-│   ├── api/
-│   │   └── routes.js             # API 路由（可选）
-│   └── index.js                  # 主入口
+│   │   ├── retrieval.js          # 3-tier retrieval core
+│   │   ├── lifecycle-monitor.js  # Lifecycle monitoring
+│   │   └── search.js             # Advanced search
+│   ├── index.js                  # Main entry
 ├── database/
-│   └── init.js                   # 数据库初始化
+│   └── init.js                   # Database initialization
 ├── config/
-│   └── default.js                # 默认配置
-├── tests/
-│   └── retrieval.test.js         # 测试用例
+│   └── loader.js                 # Configuration loader
 ├── docs/
-│   └── ARCHITECTURE.md           # 架构文档
+│   ├── SEARCH_GUIDE.md           # Search documentation
+│   └── ARCHITECTURE.md           # Architecture docs
+├── .env.example                  # Configuration template
 ├── package.json
 └── README.md
 ```
 
 ---
 
-## 🔧 API 参考
+## 🔧 API Reference
 
 ### ClawMemCore
 
 #### `storeL0(record)`
-存储极简索引
+Store minimal index
 
 ```javascript
 clawMem.storeL0({
   category: 'session',
-  summary: '简短摘要',
+  summary: 'Short summary',
   timestamp: 1234567890
 });
 ```
 
 #### `storeL1(record)`
-存储时间线索引
+Store timeline index
 
 ```javascript
 clawMem.storeL1({
   record_id: 'uuid',
   session_id: 'session_001',
   event_type: 'query',
-  semantic_summary: '语义摘要',
+  semantic_summary: 'Semantic summary',
   tags: ['tag1', 'tag2']
 });
 ```
 
 #### `storeL2(record)`
-存储完整详情
+Store full details
 
 ```javascript
 clawMem.storeL2({
   record_id: 'uuid',
-  full_content: '完整内容',
+  full_content: 'Full content',
   metadata: { key: 'value' }
 });
 ```
 
 #### `retrieve(query)`
-三层检索工作流
+3-tier retrieval workflow
 
 ```javascript
 const result = await clawMem.retrieve({
@@ -286,13 +307,33 @@ const result = await clawMem.retrieve({
 });
 ```
 
+### MemorySearch
+
+#### `searchByKeyword(keyword, options)`
+Keyword search in L0 index
+
+#### `searchByTimeRange(timeRange, options)`
+Time-based search in L1 timeline
+
+#### `searchByTags(tags, options)`
+Tag-based search
+
+#### `searchBySession(sessionId, options)`
+Full session retrieval
+
+#### `advancedSearch(query)`
+Combined search with multiple filters
+
+#### `getStats()`
+Get search statistics
+
 ### LifecycleMonitor
 
 #### `start()`
-启动监听器
+Start lifecycle monitoring
 
 #### `intercept(eventName, payload)`
-拦截事件
+Intercept OpenClaw event
 
 ```javascript
 lifecycleMonitor.intercept('tool.call', {
@@ -303,31 +344,81 @@ lifecycleMonitor.intercept('tool.call', {
 
 ---
 
-## 📈 性能指标
+## 📈 Performance Metrics
 
-| 指标 | 数值 |
-|------|------|
-| **L0 检索速度** | < 10ms |
-| **L1 检索速度** | < 50ms |
-| **L2 检索速度** | < 100ms |
-| **Token 节省** | 60-80% |
-| **存储压缩** | 70-90% |
-| **并发支持** | 100+ QPS |
+| Metric | Value |
+|--------|-------|
+| **L0 Search** | < 10ms |
+| **L1 Search** | < 50ms |
+| **L2 Search** | < 100ms |
+| **Token Savings** | 60-80% |
+| **Storage Compression** | 70-90% |
+| **Concurrent QPS** | 100+ |
 
 ---
 
-## 🤝 集成 OpenClaw
+## 📝 Changelog
 
-### 1. 修改 OpenClaw 配置
+### v0.0.5 (2026-03-11) 🆕
+
+**Documentation:**
+- ✅ Added complete English README (README.md)
+- ✅ Updated Chinese README (README-CN.md)
+- ✅ Added comprehensive API documentation
+- ✅ Added usage examples for all features
+- ✅ Added performance metrics
+
+**Improvements:**
+- ✅ Better code organization
+- ✅ Enhanced documentation structure
+- ✅ Bilingual support (EN/CN)
+
+### v0.0.4 (2026-03-11)
+
+- ✅ Updated README with v0.0.3 features
+- ✅ Added search functionality documentation
+- ✅ Minor bug fixes
+
+### v0.0.3 (2026-03-11)
+
+**Search Features:**
+- ✅ Keyword search (L0 index)
+- ✅ Time range search (L1 timeline)
+- ✅ Tag-based search
+- ✅ Session search
+- ✅ Advanced search (combined)
+- ✅ Search statistics
+
+### v0.0.2 (2026-03-11)
+
+**Configuration:**
+- ✅ Extracted all config to .env file
+- ✅ Added config loader module
+- ✅ Configurable L0/L1/L2 limits
+- ✅ Configurable worker interval
+- ✅ Database WAL mode toggle
+
+### v0.0.1 (2026-03-11)
+
+- ✅ Initial release
+- ✅ 3-tier retrieval workflow
+- ✅ Lifecycle monitoring
+- ✅ SQLite database
+
+---
+
+## 🤝 Integration with OpenClaw
+
+### 1. Configure OpenClaw
 
 ```javascript
 // openclaw.config.js
-import { lifecycleMonitor } from './clawmem/src/index.js';
+import { lifecycleMonitor, clawMem } from './clawmem/src/index.js';
 
-// 启动 ClawMem
+// Start ClawMem
 lifecycleMonitor.start();
 
-// 拦截 OpenClaw 事件
+// Intercept OpenClaw events
 openclaw.on('session.start', (payload) => {
   lifecycleMonitor.intercept('session.start', payload);
 });
@@ -337,38 +428,27 @@ openclaw.on('tool.call', (payload) => {
 });
 ```
 
-### 2. 使用记忆检索
+### 2. Use Memory in Skills
 
 ```javascript
-import clawMem from './clawmem/src/index.js';
+import { memorySearch } from './clawmem/src/index.js';
 
-// 在 OpenClaw skill 中使用
-const memory = await clawMem.retrieve({
-  category: 'session',
-  limit: 5
+// Search memory in your skill
+const memory = await memorySearch.advancedSearch({
+  keyword: 'user query',
+  includeDetails: true
 });
 ```
 
 ---
 
-## 📝 更新日志
-
-### v0.0.1 (2026-03-11)
-- ✅ 初始版本发布
-- ✅ 三层检索工作流
-- ✅ 生命周期监听器
-- ✅ SQLite 数据库
-- ✅ Token 优化机制
-
----
-
-## 📄 许可证
+## 📄 License
 
 MIT License
 
 ---
 
-## 👨‍💻 作者
+## 👨‍💻 Author
 
 **PocketAI for Leo** - OpenClaw Community
 
@@ -377,12 +457,12 @@ MIT License
 
 ---
 
-## 🙏 致谢
+## 🙏 Acknowledgments
 
-- [Claude-Mem](https://docs.claude-mem.ai/) - 架构灵感来源
-- [OpenClaw](https://github.com/openclaw/openclaw) - AI Agent 框架
-- [better-sqlite3](https://github.com/JoshuaWise/better-sqlite3) - 高性能 SQLite
+- [Claude-Mem](https://docs.claude-mem.ai/) - Architecture inspiration
+- [OpenClaw](https://github.com/openclaw/openclaw) - AI Agent framework
+- [better-sqlite3](https://github.com/JoshuaWise/better-sqlite3) - High-performance SQLite
 
 ---
 
-**让记忆管理更高效！🧠**
+**Make memory management more efficient! 🧠**
