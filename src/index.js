@@ -5,15 +5,18 @@
  * - 三层检索工作流 (L0/L1/L2)
  * - 无感知生命周期监听
  * - Token 优化 (节省 60-80%)
+ * - 高级搜索功能 (关键词/时间/标签/会话)
  */
 
 import { clawMem, ClawMemCore } from './core/retrieval.js';
 import { lifecycleMonitor, LifecycleMonitor } from './core/lifecycle-monitor.js';
+import { memorySearch, MemorySearch } from './core/search.js';
 import db from './database/init.js';
 
 // 导出核心模块
 export { clawMem, ClawMemCore };
 export { lifecycleMonitor, LifecycleMonitor };
+export { memorySearch, MemorySearch };
 export default clawMem;
 
 // 初始化
