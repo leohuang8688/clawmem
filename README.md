@@ -33,14 +33,14 @@
 ┌─────────────────────────────────────────┐
 │  L0: Minimal Index (< 100 chars)        │
 │  - Category + Timestamp + Summary       │
-│  - Token Cost: < 25 tokens/record      │
+│  - Token Cost: < 25 tokens/record       │
 │  - Purpose: Fast filtering              │
 └─────────────────────────────────────────┘
               ↓ (On-demand)
 ┌─────────────────────────────────────────┐
 │  L1: Timeline (< 500 chars)             │
 │  - Session ID + Event + Semantic Summary│
-│  - Token Cost: < 125 tokens/record     │
+│  - Token Cost: < 125 tokens/record      │
 │  - Purpose: Context & timeline          │
 └─────────────────────────────────────────┘
               ↓ (When needed)
