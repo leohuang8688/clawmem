@@ -12,7 +12,7 @@
 
 ## 📖 Introduction
 
-**ClawMem v0.0.5** is a lightweight memory management system designed for OpenClaw, inspired by [Claude-Mem](https://docs.claude-mem.ai/).
+**ClawMem v0.0.5** is a lightweight memory management system designed for OpenClaw.
 
 ### Core Features
 
