@@ -12,7 +12,7 @@
 
 ## 📖 简介
 
-**ClawMem v0.0.5** 是一个受 [Claude-Mem](https://docs.claude-mem.ai/) 启发的轻量级记忆管理系统，专为 OpenClaw 设计。
+**ClawMem v0.0.5** 是一个轻量级记忆管理系统，专为 OpenClaw 设计。
 
 ### 核心特性
 
